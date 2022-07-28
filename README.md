@@ -8,19 +8,15 @@ Required gpsd libraries and influxdb-client
 ```
 pip install influxdb-client
 ```
-
-It loads the configuration from config.ini, the format is standard. It needs to be placed in the same directory as the python script, e.g. /opt/gpsd_influx2/config.ini
-
+Then pull into /opt
 ```
-[influx2]
-url=http://localhost:8086
-org=my-org
-token=my-token
-timeout=6000
-verify_ssl=False
-```
+cd /opt
 
-/etc/systemd/system/gpsd_influx2.service
+sudo git pull https://github.com/longview/gpsd_influx2.git
+```
+It loads the configuration from config.ini, the format is standard. A sample file in included, edit it to add your database details & API key.
+
+Create /etc/systemd/system/gpsd_influx2.service
 ```
 [Unit]
 Description=GPSD to Influx
