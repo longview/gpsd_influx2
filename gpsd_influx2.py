@@ -8,6 +8,8 @@ import sys
 import threading
 import time
 
+from pprint import pprint
+
 # Your InfluxDB Settings
 from datetime import datetime
 
@@ -25,14 +27,14 @@ hostname = socket.gethostname()
 
 # --------------------------------------------------------------------------------
 # Command Line Options
-options, remainder = getopt.gnu_getopt(
-  sys.argv[1:], 'd', ['debug'])
 
 debug = None
+detailed_sats = None
 
-for opt, arg in options:
-  if opt in ('-d', '--debug'):
+if "-d" in sys.argv:
     debug = True
+if "-s" in sys.argv:
+    detailed_sats = True
 
 # --------------------------------------------------------------------------------
 # GPS Thread
@@ -97,6 +99,8 @@ if __name__ == '__main__':
                     print("gpsd-python,host=",hostname,",tpv=track value=",gpsd_track)
                     print("gpsd-python,host=",hostname,",sats_vis value=",gpsd_sats_vis)
                     print("gpsd-python,host=",hostname,",sats_used value=",gpsd_sats_used)
+                    if detailed_sats == True:
+                        pprint(gpsd.satellites)
 
                 write_api = client.write_api(write_options=SYNCHRONOUS)
                 if not math.isnan(gpsd_alt):
@@ -144,9 +148,24 @@ if __name__ == '__main__':
                 if not math.isnan(gpsd_sats_used):
                     p = Point("gpsd").tag("host", hostname).field("sats_used", gpsd_sats_used)
                     write_api.write(bucket=bucket, record=p)
-                #influx_client = InfluxDBClient(influx_host, influx_port, influx_user, influx_pass, influx_db)
-
-                #influx_client.write_points(influx_json_body)
+                if detailed_sats == True:
+                    for sat in gpsd.satellites:
+                        # probably not the optimal way to do it, but gpsd isn't super well documented and I'm not good at python
+                        # "PRN:   2  E:  19  Az: 244  Ss:  24  Used: y"
+                        # ideally we should also split off by system, and by SBAS or not?
+                        satparms = str(sat).split()
+                        prn = int(satparms[1])
+                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn).field("ele", int(satparms[3]))
+                        write_api.write(bucket=bucket, record=p)
+                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn).field("azi", int(satparms[5]))
+                        write_api.write(bucket=bucket, record=p)
+                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn).field("snr", int(satparms[7]))
+                        write_api.write(bucket=bucket, record=p)
+                        satused = 0;
+                        if "y" in satparms[9]:
+                            satused = 1
+                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn).field("used", int(satused))
+                        write_api.write(bucket=bucket, record=p)
 
                 time.sleep(update_interval)
 
