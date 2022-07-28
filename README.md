@@ -25,8 +25,8 @@ Description=GPSD to Influx
 After=syslog.target
 
 [Service]
-WorkingDirectory=/opt/gpsd-influx2/
-ExecStart=/usr/bin/python3 /opt/gpsd-influx2/gpsd-influx2.py
+WorkingDirectory=/opt/gpsd_influx2/
+ExecStart=/usr/bin/python3 /opt/gpsd_influx2/gpsd_influx2.py
 KillMode=process
 Restart=on-failure
 User=<user>
