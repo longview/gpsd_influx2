@@ -101,49 +101,49 @@ if __name__ == '__main__':
                 write_api = client.write_api(write_options=SYNCHRONOUS)
                 if not math.isnan(gpsd_alt):
                     p = Point("gpsd").tag("host", hostname).field("alt", gpsd_alt)
-                    write_api.write(bucket=bucket, org=org, record=p)
+                    write_api.write(bucket=bucket, record=p)
                 if not math.isnan(gpsd_climb):
                     p = Point("gpsd").tag("host", hostname).field("climb", gpsd_climb)
-                    write_api.write(bucket=bucket, org=org, record=p)
+                    write_api.write(bucket=bucket, record=p)
                 if not math.isnan(gpsd_epc):
                     p = Point("gpsd").tag("host", hostname).field("epc", gpsd_epc)
-                    write_api.write(bucket=bucket, org=org, record=p)
+                    write_api.write(bucket=bucket, record=p)
                 if not math.isnan(gpsd_eps):
                     p = Point("gpsd").tag("host", hostname).field("eps", gpsd_eps)
-                    write_api.write(bucket=bucket, org=org, record=p)
+                    write_api.write(bucket=bucket, record=p)
                 if not math.isnan(gpsd_ept):
                     p = Point("gpsd").tag("host", hostname).field("ept", gpsd_ept)
-                    write_api.write(bucket=bucket, org=org, record=p)
+                    write_api.write(bucket=bucket, record=p)
                 if not math.isnan(gpsd_epv):
                     p = Point("gpsd").tag("host", hostname).field("epv", gpsd_epv)
-                    write_api.write(bucket=bucket, org=org, record=p)
+                    write_api.write(bucket=bucket, record=p)
                 if not math.isnan(gpsd_epx):
                     p = Point("gpsd").tag("host", hostname).field("epx", gpsd_epx)
-                    write_api.write(bucket=bucket, org=org, record=p)
+                    write_api.write(bucket=bucket, record=p)
                 if not math.isnan(gpsd_epy):
                     p = Point("gpsd").tag("host", hostname).field("epy", gpsd_epy)
-                    write_api.write(bucket=bucket, org=org, record=p)
+                    write_api.write(bucket=bucket, record=p)
                 if not math.isnan(gpsd_lat):
                     p = Point("gpsd").tag("host", hostname).field("lat", gpsd_lat)
-                    write_api.write(bucket=bucket, org=org, record=p)
+                    write_api.write(bucket=bucket, record=p)
                 if not math.isnan(gpsd_lon):
                     p = Point("gpsd").tag("host", hostname).field("lon", gpsd_lon)
-                    write_api.write(bucket=bucket, org=org, record=p)
+                    write_api.write(bucket=bucket, record=p)
                 if not math.isnan(gpsd_mode):
                     p = Point("gpsd").tag("host", hostname).field("mode", gpsd_mode)
-                    write_api.write(bucket=bucket, org=org, record=p)
+                    write_api.write(bucket=bucket, record=p)
                 if not math.isnan(gpsd_speed):
                     p = Point("gpsd").tag("host", hostname).field("speed", gpsd_speed)
-                    write_api.write(bucket=bucket, org=org, record=p)
+                    write_api.write(bucket=bucket, record=p)
                 if not math.isnan(gpsd_track):
                     p = Point("gpsd").tag("host", hostname).field("track", gpsd_track)
-                    write_api.write(bucket=bucket, org=org, record=p)
+                    write_api.write(bucket=bucket, record=p)
                 if not math.isnan(gpsd_sats_vis):
                     p = Point("gpsd").tag("host", hostname).field("sats_vis", gpsd_sats_vis)
-                    write_api.write(bucket=bucket, org=org, record=p)
+                    write_api.write(bucket=bucket, record=p)
                 if not math.isnan(gpsd_sats_used):
                     p = Point("gpsd").tag("host", hostname).field("sats_used", gpsd_sats_used)
-                    write_api.write(bucket=bucket, org=org, record=p)
+                    write_api.write(bucket=bucket, record=p)
                 #influx_client = InfluxDBClient(influx_host, influx_port, influx_user, influx_pass, influx_db)
 
                 #influx_client.write_points(influx_json_body)
