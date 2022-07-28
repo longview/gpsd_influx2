@@ -1,6 +1,8 @@
 # gpsd_influx2
 Based on https://github.com/mzac/gpsd-influx
 
+Updated to use the influxdb v2 API, also added satellites visibility and tracked counts to the log output.
+
 
 Required gpsd libraries and influxdb-client
 ```
