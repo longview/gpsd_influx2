@@ -7,7 +7,7 @@ Required gpsd libraries and influxdb-client
 pip install influxdb-client
 ```
 
-It loads the configuration from config.ini, the format is standard. It needs to be placed in the same directory as the python script, e.g. /opt/gpsd-influx2/config.ini
+It loads the configuration from config.ini, the format is standard. It needs to be placed in the same directory as the python script, e.g. /opt/gpsd_influx2/config.ini
 
 ```
 [influx2]
@@ -18,7 +18,7 @@ timeout=6000
 verify_ssl=False
 ```
 
-/etc/systemd/system/gpsd-influx2.service
+/etc/systemd/system/gpsd_influx2.service
 ```
 [Unit]
 Description=GPSD to Influx
@@ -33,4 +33,16 @@ User=<user>
 
 [Install]
 WantedBy=multi-user.target
+```
+
+Then the usual:
+```
+sudo systemctl daemon-reload
+sudo systemctl enable gpsd_influx2
+sudo systemctl start gpsd_influx2
+```
+
+Errors will be logged, if nothing goes wrong no outputs will be generated:
+```
+journalctl -fu gpsd_influx2.service
 ```
