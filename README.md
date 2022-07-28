@@ -3,6 +3,7 @@ Based on https://github.com/mzac/gpsd-influx
 
 Updated to use the influxdb v2 API, also added satellites visibility and tracked counts to the log output.
 
+You can also optionally log detailed satellite information by adding -s to the command line.
 
 Required gpsd libraries and influxdb-client
 ```
@@ -24,7 +25,7 @@ After=syslog.target
 
 [Service]
 WorkingDirectory=/opt/gpsd_influx2/
-ExecStart=/usr/bin/python3 /opt/gpsd_influx2/gpsd_influx2.py
+ExecStart=/usr/bin/python3 /opt/gpsd_influx2/gpsd_influx2.py -s
 KillMode=process
 Restart=on-failure
 User=<user>
