@@ -103,51 +103,52 @@ if __name__ == '__main__':
                         pprint(gpsd.satellites)
 
                 write_api = client.write_api(write_options=SYNCHRONOUS)
+                points = []
                 if not math.isnan(gpsd_alt):
                     p = Point("gpsd").tag("host", hostname).field("alt", gpsd_alt)
-                    write_api.write(bucket=bucket, record=p)
+                    points.append(p)
                 if not math.isnan(gpsd_climb):
                     p = Point("gpsd").tag("host", hostname).field("climb", gpsd_climb)
-                    write_api.write(bucket=bucket, record=p)
+                    points.append(p)
                 if not math.isnan(gpsd_epc):
                     p = Point("gpsd").tag("host", hostname).field("epc", gpsd_epc)
-                    write_api.write(bucket=bucket, record=p)
+                    points.append(p)
                 if not math.isnan(gpsd_eps):
                     p = Point("gpsd").tag("host", hostname).field("eps", gpsd_eps)
-                    write_api.write(bucket=bucket, record=p)
+                    points.append(p)
                 if not math.isnan(gpsd_ept):
                     p = Point("gpsd").tag("host", hostname).field("ept", gpsd_ept)
-                    write_api.write(bucket=bucket, record=p)
+                    points.append(p)
                 if not math.isnan(gpsd_epv):
                     p = Point("gpsd").tag("host", hostname).field("epv", gpsd_epv)
-                    write_api.write(bucket=bucket, record=p)
+                    points.append(p)
                 if not math.isnan(gpsd_epx):
                     p = Point("gpsd").tag("host", hostname).field("epx", gpsd_epx)
-                    write_api.write(bucket=bucket, record=p)
+                    points.append(p)
                 if not math.isnan(gpsd_epy):
                     p = Point("gpsd").tag("host", hostname).field("epy", gpsd_epy)
-                    write_api.write(bucket=bucket, record=p)
+                    points.append(p)
                 if not math.isnan(gpsd_lat):
                     p = Point("gpsd").tag("host", hostname).field("lat", gpsd_lat)
-                    write_api.write(bucket=bucket, record=p)
+                    points.append(p)
                 if not math.isnan(gpsd_lon):
                     p = Point("gpsd").tag("host", hostname).field("lon", gpsd_lon)
-                    write_api.write(bucket=bucket, record=p)
+                    points.append(p)
                 if not math.isnan(gpsd_mode):
                     p = Point("gpsd").tag("host", hostname).field("mode", gpsd_mode)
-                    write_api.write(bucket=bucket, record=p)
+                    points.append(p)
                 if not math.isnan(gpsd_speed):
                     p = Point("gpsd").tag("host", hostname).field("speed", gpsd_speed)
-                    write_api.write(bucket=bucket, record=p)
+                    points.append(p)
                 if not math.isnan(gpsd_track):
                     p = Point("gpsd").tag("host", hostname).field("track", gpsd_track)
-                    write_api.write(bucket=bucket, record=p)
+                    points.append(p)
                 if not math.isnan(gpsd_sats_vis):
                     p = Point("gpsd").tag("host", hostname).field("sats_vis", gpsd_sats_vis)
-                    write_api.write(bucket=bucket, record=p)
+                    points.append(p)
                 if not math.isnan(gpsd_sats_used):
                     p = Point("gpsd").tag("host", hostname).field("sats_used", gpsd_sats_used)
-                    write_api.write(bucket=bucket, record=p)
+                    points.append(p)
                 if detailed_sats == True:
                     for sat in gpsd.satellites:
                         # probably not the optimal way to do it, but gpsd isn't super well documented and I'm not good at python
@@ -156,17 +157,18 @@ if __name__ == '__main__':
                         satparms = str(sat).split()
                         prn = int(satparms[1])
                         p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn).field("ele", int(satparms[3]))
-                        write_api.write(bucket=bucket, record=p)
+                        points.append(p)
                         p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn).field("azi", int(satparms[5]))
-                        write_api.write(bucket=bucket, record=p)
+                        points.append(p)
                         p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn).field("snr", int(satparms[7]))
-                        write_api.write(bucket=bucket, record=p)
+                        points.append(p)
                         satused = 0;
                         if "y" in satparms[9]:
                             satused = 1
                         p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn).field("used", int(satused))
-                        write_api.write(bucket=bucket, record=p)
-
+                        points.append(p)
+                        
+                write_api.write(bucket=bucket, record=points)
                 time.sleep(update_interval)
 
         except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
