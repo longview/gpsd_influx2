@@ -1,0 +1,13 @@
+[Unit]
+Description=GPSD to Influx
+After=syslog.target
+
+[Service]
+WorkingDirectory=/opt/gpsd_influx2/
+ExecStart=/usr/bin/python3 /opt/gpsd_influx2/gpsd_influx2.py -s
+KillMode=process
+Restart=on-failure
+User=<user>
+
+[Install]
+WantedBy=multi-user.target
