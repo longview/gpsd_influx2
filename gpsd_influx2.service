@@ -1,7 +1,7 @@
 [Unit]
 Description=GPSD to Influx
 After=gpsd.service
-Required=gpsd.service
+Requires=gpsd.service
 PartOf=gpsd.service
 
 [Service]
