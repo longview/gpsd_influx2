@@ -30,11 +30,14 @@ hostname = socket.gethostname()
 
 debug = None
 detailed_sats = None
+output = True
 
 if "-d" in sys.argv:
     debug = True
 if "-s" in sys.argv:
     detailed_sats = True
+if "-o" in sys.argv:
+    output = None
 
 # --------------------------------------------------------------------------------
 # GPS Thread
@@ -156,19 +159,64 @@ if __name__ == '__main__':
                         # ideally we should also split off by system, and by SBAS or not?
                         satparms = str(sat).split()
                         prn = int(satparms[1])
-                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn).field("ele", int(satparms[3]))
+                        prn_str = ""
+                        # https://gpsd.gitlab.io/gpsd/gpsd_json.html gives a bit of a clue here?
+                        # PRN ID of the satellite. 1-63 are GNSS satellites, 64-96 are GLONASS satellites, 100-164 are SBAS satellites
+                        # however, it does not specify what happens with Galileo or Beidou?
+                        # and then we finally find in driver_nmea0183.c
+                        #     *   1..32:  GPS
+                        #     *   33..64: Various SBAS systems (EGNOS, WAAS, SDCM, GAGAN, MSAS)
+                        #     *   65..96: GLONASS
+                        #     *   101..136: Quectel Querk, (not NMEA), seems to be Galileo
+                        #     *   152..158: Various SBAS systems (EGNOS, WAAS, SDCM, GAGAN, MSAS)
+                        #     *   173..182: IMES
+                        #     *   193..202: QZSS   (u-blox extended 4.10)
+                        #     *   201..264: BeiDou (not NMEA, not u-blox?) Quectel Querk.
+                        #     *   301..336: Galileo
+                        #     *   401..437: BeiDou
+                        #     *   null: GLONASS unused
+                        #     *   500-509: NavIC (IRNSS)  NOT STANDARD!
+                        # at the risk of pissing someone off, it's funny how ESR wrote a big rant about lacking documentation from GPS vendors
+                        # given how I keep having to dig around in the source code of gpsd
+                        if prn <= 32:
+                            prn_str = "GP"+str(prn)
+                        elif prn >= 33 and prn <= 64:
+                            # SBAS stuff is offset -87 for some reason
+                            prn_str = "S"+str(prn+87)
+                        elif prn >= 65 and prn <= 96:
+                            # GLONASS is offset +64
+                            prn_str = "GL"+str(prn-64)
+                        elif prn >= 152 and prn <= 158:
+                            prn_str = "S"+str(prn)
+                        elif prn >= 193 and prn <= 202:
+                            # QSZZ is offset +64
+                            prn_str = "QS"+str(prn-192)
+                        elif prn >= 201 and prn <= 264:
+                            # BeiDou is offset +200
+                            prn_str = "B"+str(prn-200)
+                        elif prn >= 301 and prn <= 336:
+                            # Galileo is offset +300
+                            prn_str = "GA"+str(prn-300)
+                        elif prn >= 401 and prn <= 437:
+                            # More BeiDou offset +400
+                            prn_str = "B"+str(prn-400)
+
+                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn_str).field("ele", int(satparms[3]))
                         points.append(p)
-                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn).field("azi", int(satparms[5]))
+                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn_str).field("azi", int(satparms[5]))
                         points.append(p)
-                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn).field("snr", int(satparms[7]))
+                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn_str).field("snr", int(satparms[7]))
                         points.append(p)
                         satused = 0;
                         if "y" in satparms[9]:
                             satused = 1
-                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn).field("used", int(satused))
+                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn_str).field("used", int(satused))
                         points.append(p)
-                        
-                write_api.write(bucket=bucket, record=points)
+                        if debug == True:
+                            print(prn_str)
+                if output == True:
+                    write_api.write(bucket=bucket, record=points)
+                
                 time.sleep(update_interval)
 
         except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
