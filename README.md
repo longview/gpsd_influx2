@@ -18,7 +18,7 @@ sudo git pull https://github.com/longview/gpsd_influx2.git
 ```
 It loads the configuration from config.ini, the format is standard. A sample file in included, edit it to add your database details & API key.
 
-Create to gpsd_influx2.service /etc/systemd/system/ and update the User field
+Copy gpsd_influx2.service /etc/systemd/system/ and update the User field
 
 Then the usual:
 ```
