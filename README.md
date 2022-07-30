@@ -4,6 +4,7 @@ Based on https://github.com/mzac/gpsd-influx
 Updated to use the influxdb v2 API, also added satellites visibility and tracked counts to the log output.
 
 You can also optionally log detailed satellite information by adding -s to the command line.
+Use -o to disable database writes.
 
 Required gpsd libraries and influxdb-client
 ```
