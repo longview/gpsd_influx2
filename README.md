@@ -18,22 +18,7 @@ sudo git pull https://github.com/longview/gpsd_influx2.git
 ```
 It loads the configuration from config.ini, the format is standard. A sample file in included, edit it to add your database details & API key.
 
-Create /etc/systemd/system/gpsd_influx2.service
-```
-[Unit]
-Description=GPSD to Influx
-After=syslog.target
-
-[Service]
-WorkingDirectory=/opt/gpsd_influx2/
-ExecStart=/usr/bin/python3 /opt/gpsd_influx2/gpsd_influx2.py -s
-KillMode=process
-Restart=on-failure
-User=<user>
-
-[Install]
-WantedBy=multi-user.target
-```
+Create to gpsd_influx2.service /etc/systemd/system/ and update the User field
 
 Then the usual:
 ```
@@ -41,6 +26,8 @@ sudo systemctl daemon-reload
 sudo systemctl enable gpsd_influx2
 sudo systemctl start gpsd_influx2
 ```
+
+The default service script is linked to gpsd.service, and will restart if gpsd.service is restarted. This is to work around an issue where the gpsd client hangs if the service is restarted.
 
 Errors will be logged, if nothing goes wrong no outputs will be generated:
 ```
