@@ -1,6 +1,8 @@
 [Unit]
 Description=GPSD to Influx
-After=syslog.target
+After=gpsd.service
+Required=gpsd.service
+PartOf=gpsd.service
 
 [Service]
 WorkingDirectory=/opt/gpsd_influx2/
