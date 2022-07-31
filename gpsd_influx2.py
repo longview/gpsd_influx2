@@ -313,7 +313,7 @@ if __name__ == '__main__':
                         p = Point("gpsd").tag("host", hostname).field("fixstatus_modified", 4)
                         points.append(p)
                     else:
-                        p = Point("gpsd").tag("host", hostname).field("fixstatus_modified", gpsd_mode)
+                        p = Point("gpsd").tag("host", hostname).field("fixstatus_modified", int(gpsd_mode))
                         points.append(p)
 
                 if output == True:
