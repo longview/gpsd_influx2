@@ -80,10 +80,16 @@ if __name__ == '__main__':
                 gpsd_lat   = float(gpsd.fix.latitude)
                 gpsd_lon   = float(gpsd.fix.longitude)
                 gpsd_mode  = float(gpsd.fix.mode)
+                gpsd_status  = int(gpsd.status)
                 gpsd_speed = float(gpsd.fix.speed)
                 gpsd_track = float(gpsd.fix.track)
                 gpsd_sats_vis = int(len(gpsd.satellites))
                 gpsd_sats_used = int(gpsd.satellites_used)
+
+                # combined status field, 0-4 = ZERO, NO_FIX, 2D, 3D, DGPS
+                gpsd_status_combined = gpsd_mode
+                if gpsd_status == 2 and gpsd_mode == 3:
+                    gpsd_status_combined = 4
 
                 # Make sure we have a lat, lon and alt
                 if debug == True:
@@ -102,6 +108,9 @@ if __name__ == '__main__':
                     print("gpsd-python,host=",hostname,",tpv=track value=",gpsd_track)
                     print("gpsd-python,host=",hostname,",sats_vis value=",gpsd_sats_vis)
                     print("gpsd-python,host=",hostname,",sats_used value=",gpsd_sats_used)
+                    print("gpsd-python,host=",hostname,",status value=",gpsd_status)
+                    print("gpsd-python,host=",hostname,",status_combined value=",gpsd_status_combined)
+                    pprint(gpsd)
                     if detailed_sats == True:
                         pprint(gpsd.satellites)
 
@@ -145,6 +154,12 @@ if __name__ == '__main__':
                     points.append(p)
                 if not math.isnan(gpsd_track):
                     p = Point("gpsd").tag("host", hostname).field("track", gpsd_track)
+                    points.append(p)
+                if not math.isnan(gpsd_status):
+                    p = Point("gpsd").tag("host", hostname).field("status", gpsd_status)
+                    points.append(p)
+                if not math.isnan(gpsd_status_combined):
+                    p = Point("gpsd").tag("host", hostname).field("status_combined", gpsd_status_combined)
                     points.append(p)
                 if not math.isnan(gpsd_sats_vis):
                     p = Point("gpsd").tag("host", hostname).tag("gnss_system", "all").field("sats_vis", gpsd_sats_vis)
@@ -261,7 +276,7 @@ if __name__ == '__main__':
                         p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn_str).tag("gnss_system", gnss_system).field("used", int(satused))
                         points.append(p)
                         if debug == True:
-                            print(prn_str)
+                            print(prn_str + " " + gnss_system)
                     
                     p = Point("gpsd").tag("host", hostname).tag("gnss_system", "NavStar").field("sats_used", tracked_gps_count)
                     points.append(p)
