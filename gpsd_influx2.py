@@ -216,11 +216,16 @@ if __name__ == '__main__':
                             print(prn_str)
                 if output == True:
                     write_api.write(bucket=bucket, record=points)
+
                 
                 time.sleep(update_interval)
-
         except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
             print ("\nKilling Thread...")
             gpsp.running = False
             gpsp.join() # wait for the thread to finish what it's doing
             print ("Done.\nExiting.")
+        except:
+            print ("Something went wrong, probably gpsd or influx died. Terminating.")
+            gpsp.running = False
+            gpsp.join() # wait for the thread to finish what it's doing
+            sys.exit(1) # exit with error code
