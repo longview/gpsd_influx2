@@ -308,6 +308,14 @@ if __name__ == '__main__':
                     p = Point("gpsd").tag("host", hostname).tag("gnss_system", "Galileo").field("sats_vis", galileo_count)
                     points.append(p)
 
+                    # assume that if we have SBAS and a 3D fix, then we're DGPS fixed
+                    if tracked_sbas_count > 0 or tracked_qszz_count > 0 and gpsd_mode == 3:
+                        p = Point("gpsd").tag("host", hostname).field("fixstatus_modified", 4)
+                        points.append(p)
+                    else:
+                        p = Point("gpsd").tag("host", hostname).field("fixstatus_modified", gpsd_mode)
+                        points.append(p)
+
                 if output == True:
                     write_api.write(bucket=bucket, record=points)
 
