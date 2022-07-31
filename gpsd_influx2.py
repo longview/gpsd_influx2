@@ -147,12 +147,24 @@ if __name__ == '__main__':
                     p = Point("gpsd").tag("host", hostname).field("track", gpsd_track)
                     points.append(p)
                 if not math.isnan(gpsd_sats_vis):
-                    p = Point("gpsd").tag("host", hostname).field("sats_vis", gpsd_sats_vis)
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "all").field("sats_vis", gpsd_sats_vis)
                     points.append(p)
                 if not math.isnan(gpsd_sats_used):
-                    p = Point("gpsd").tag("host", hostname).field("sats_used", gpsd_sats_used)
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "all").field("sats_used", gpsd_sats_used)
                     points.append(p)
                 if detailed_sats == True:
+                    gps_count = 0
+                    sbas_count = 0
+                    glonass_count = 0
+                    qszz_count = 0
+                    galileo_count = 0
+                    beidou_count = 0
+                    tracked_gps_count = 0
+                    tracked_sbas_count = 0
+                    tracked_glonass_count = 0
+                    tracked_qszz_count = 0
+                    tracked_galileo_count = 0
+                    tracked_beidou_count = 0
                     for sat in gpsd.satellites:
                         # probably not the optimal way to do it, but gpsd isn't super well documented and I'm not good at python
                         # "PRN:   2  E:  19  Az: 244  Ss:  24  Used: y"
@@ -178,42 +190,109 @@ if __name__ == '__main__':
                         #     *   500-509: NavIC (IRNSS)  NOT STANDARD!
                         # at the risk of pissing someone off, it's funny how ESR wrote a big rant about lacking documentation from GPS vendors
                         # given how I keep having to dig around in the source code of gpsd
-                        if prn <= 32:
-                            prn_str = "GP"+str(prn)
-                        elif prn >= 33 and prn <= 64:
-                            # SBAS stuff is offset -87 for some reason
-                            prn_str = "S"+str(prn+87)
-                        elif prn >= 65 and prn <= 96:
-                            # GLONASS is offset +64
-                            prn_str = "GL"+str(prn-64)
-                        elif prn >= 152 and prn <= 158:
-                            prn_str = "S"+str(prn)
-                        elif prn >= 193 and prn <= 202:
-                            # QSZZ is offset +64
-                            prn_str = "QS"+str(prn-192)
-                        elif prn >= 201 and prn <= 264:
-                            # BeiDou is offset +200
-                            prn_str = "B"+str(prn-200)
-                        elif prn >= 301 and prn <= 336:
-                            # Galileo is offset +300
-                            prn_str = "GA"+str(prn-300)
-                        elif prn >= 401 and prn <= 437:
-                            # More BeiDou offset +400
-                            prn_str = "B"+str(prn-400)
 
-                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn_str).field("ele", int(satparms[3]))
-                        points.append(p)
-                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn_str).field("azi", int(satparms[5]))
-                        points.append(p)
-                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn_str).field("snr", int(satparms[7]))
-                        points.append(p)
                         satused = 0;
                         if "y" in satparms[9]:
                             satused = 1
-                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn_str).field("used", int(satused))
+
+                        gnss_system = ""
+
+                        if prn <= 32:
+                            prn_str = "GP"+str(prn)
+                            gps_count += 1
+                            if satused == 1:
+                                tracked_gps_count += 1
+                            gnss_system = "NavStar"
+                        elif prn >= 33 and prn <= 64:
+                            # SBAS stuff is offset -87 for some reason
+                            prn_str = "S"+str(prn+87)
+                            sbas_count += 1
+                            if satused == 1:
+                                tracked_sbas_count += 1
+                            gnss_system = "SBAS"
+                        elif prn >= 65 and prn <= 96:
+                            # GLONASS is offset +64
+                            prn_str = "GL"+str(prn-64)
+                            glonass_count += 1
+                            if satused == 1:
+                                tracked_glonass_count += 1
+                            gnss_system = "GLONASS"
+                        elif prn >= 152 and prn <= 158:
+                            prn_str = "S"+str(prn)
+                            sbas_count += 1
+                            if satused == 1:
+                                tracked_sbas_count += 1
+                            gnss_system = "SBAS"
+                        elif prn >= 193 and prn <= 202:
+                            # QSZZ is offset +64
+                            prn_str = "QS"+str(prn-192)
+                            qszz_count += 1
+                            if satused == 1:
+                                tracked_qszz_count += 1
+                            gnss_system = "QSZZ"
+                        elif prn >= 201 and prn <= 264:
+                            # BeiDou is offset +200
+                            prn_str = "B"+str(prn-200)
+                            beidou_count += 1
+                            if satused == 1:
+                                tracked_beidou_count += 1
+                            gnss_system = "BeiDou"
+                        elif prn >= 301 and prn <= 336:
+                            # Galileo is offset +300
+                            prn_str = "GA"+str(prn-300)
+                            galileo_count += 1
+                            if satused == 1:
+                                tracked_galileo_count += 1
+                            gnss_system = "Galileo"
+                        elif prn >= 401 and prn <= 437:
+                            # More BeiDou offset +400
+                            prn_str = "B"+str(prn-400)
+                            beidou_count += 1
+                            if satused == 1:
+                                tracked_beidou_count += 1
+                            gnss_system = "BeiDou"
+
+                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn_str).tag("gnss_system", gnss_system).field("ele", int(satparms[3]))
+                        points.append(p)
+                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn_str).tag("gnss_system", gnss_system).field("azi", int(satparms[5]))
+                        points.append(p)
+                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn_str).tag("gnss_system", gnss_system).field("snr", int(satparms[7]))
+                        points.append(p)
+                        p = Point("gpsd_sat_details").tag("host", hostname).tag("prn", prn_str).tag("gnss_system", gnss_system).field("used", int(satused))
                         points.append(p)
                         if debug == True:
                             print(prn_str)
+                    
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "NavStar").field("sats_used", tracked_gps_count)
+                    points.append(p)
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "NavStar").field("sats_vis", gps_count)
+                    points.append(p)
+
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "SBAS").field("sats_used", tracked_sbas_count)
+                    points.append(p)
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "SBAS").field("sats_vis", sbas_count)
+                    points.append(p)
+
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "GLONASS").field("sats_used", tracked_glonass_count)
+                    points.append(p)
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "GLONASS").field("sats_vis", glonass_count)
+                    points.append(p)
+
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "QSZZ").field("sats_used", tracked_qszz_count)
+                    points.append(p)
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "QSZZ").field("sats_vis", qszz_count)
+                    points.append(p)
+
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "BeiDou").field("sats_used", tracked_gps_count)
+                    points.append(p)
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "BeiDou").field("sats_vis", gps_count)
+                    points.append(p)
+
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "Galileo").field("sats_used", tracked_galileo_count)
+                    points.append(p)
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "Galileo").field("sats_vis", galileo_count)
+                    points.append(p)
+
                 if output == True:
                     write_api.write(bucket=bucket, record=points)
 
