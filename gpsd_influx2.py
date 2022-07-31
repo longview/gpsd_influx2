@@ -283,9 +283,9 @@ if __name__ == '__main__':
                     p = Point("gpsd").tag("host", hostname).tag("gnss_system", "QSZZ").field("sats_vis", qszz_count)
                     points.append(p)
 
-                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "BeiDou").field("sats_used", tracked_gps_count)
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "BeiDou").field("sats_used", tracked_beidou_count)
                     points.append(p)
-                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "BeiDou").field("sats_vis", gps_count)
+                    p = Point("gpsd").tag("host", hostname).tag("gnss_system", "BeiDou").field("sats_vis", beidou_count)
                     points.append(p)
 
                     p = Point("gpsd").tag("host", hostname).tag("gnss_system", "Galileo").field("sats_used", tracked_galileo_count)
