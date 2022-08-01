@@ -58,7 +58,7 @@
         },
         "options": {
           "colorMode": "value",
-          "graphMode": "area",
+          "graphMode": "none",
           "justifyMode": "auto",
           "orientation": "auto",
           "reduceOptions": {
@@ -94,7 +94,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"sats_used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"sats_used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
             "refId": "A",
             "resultFormat": "time_series",
             "select": [
@@ -175,7 +175,7 @@
         },
         "options": {
           "colorMode": "value",
-          "graphMode": "area",
+          "graphMode": "none",
           "justifyMode": "auto",
           "orientation": "auto",
           "reduceOptions": {
@@ -211,7 +211,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"sats_vis\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"sats_vis\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
             "refId": "A",
             "resultFormat": "time_series",
             "select": [
@@ -713,7 +713,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(B)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
             "refId": "A",
             "resultFormat": "time_series",
             "select": [
@@ -731,9 +731,91 @@
               ]
             ],
             "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([B])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "H"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "I"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "E"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "F"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(GP)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "C"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GP])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "D"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(QS])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "G"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([S])([0-9])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "J"
           }
         ],
         "title": "SNR",
+        "transformations": [],
         "type": "gauge"
       }
     },
@@ -823,7 +905,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(B)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
             "refId": "A",
             "resultFormat": "time_series",
             "select": [
@@ -841,9 +923,91 @@
               ]
             ],
             "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([B])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "H"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "I"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "E"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "F"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(GP)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "C"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GP])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "D"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(QS])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "G"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([S])([0-9])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "J"
           }
         ],
         "title": "Tracking Status",
+        "transformations": [],
         "type": "stat"
       }
     },
@@ -879,7 +1043,8 @@
               "lineWidth": 1,
               "pointSize": 5,
               "scaleDistribution": {
-                "type": "linear"
+                "log": 2,
+                "type": "log"
               },
               "showPoints": "never",
               "spanNulls": false,
@@ -891,9 +1056,7 @@
                 "mode": "off"
               }
             },
-            "decimals": 0,
             "mappings": [],
-            "min": 0,
             "thresholds": {
               "mode": "absolute",
               "steps": [
@@ -1111,12 +1274,1737 @@
               "type": "influxdb",
               "uid": "${DS_INFLUXDB}"
             },
-            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(B)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
             "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([B])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "H"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "I"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "E"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "F"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(GP)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "C"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GP])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "D"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(QS])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "G"
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "hide": false,
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([S])([0-9])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "J"
           }
         ],
         "title": "Satellite Tracking",
+        "transformations": [],
         "type": "state-timeline"
+      }
+    },
+    "F1MRFAzVk": {
+      "name": "Satellite SNR",
+      "uid": "F1MRFAzVk",
+      "kind": 1,
+      "model": {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "${DS_INFLUXDB}"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "graph": false,
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "lineInterpolation": "smooth",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "decimals": 0,
+            "mappings": [],
+            "max": 60,
+            "min": 15,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "dB"
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "7.5.11",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(B)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([B])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "B",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "C",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "D",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "E",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "F",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(GP)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "G",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GP])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "H",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(QS])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "I",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([S])([0-9])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "J",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "title": "Satellite SNR",
+        "transformations": [],
+        "type": "timeseries"
+      }
+    },
+    "yZAUO0kVk": {
+      "name": "Satellite Az",
+      "uid": "yZAUO0kVk",
+      "kind": 1,
+      "model": {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "${DS_INFLUXDB}"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "axisWidth": 50,
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "graph": false,
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "lineInterpolation": "stepBefore",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "decimals": 0,
+            "mappings": [
+              {
+                "options": {
+                  "from": 0,
+                  "result": {
+                    "text": "N"
+                  },
+                  "to": 11.25
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 11.25,
+                  "result": {
+                    "text": "NNE"
+                  },
+                  "to": 33.75
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 33.75,
+                  "result": {
+                    "text": "NE"
+                  },
+                  "to": 56.25
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 56.25,
+                  "result": {
+                    "text": "ENE"
+                  },
+                  "to": 78.75
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 78.75,
+                  "result": {
+                    "text": "E"
+                  },
+                  "to": 101.25
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 101.25,
+                  "result": {
+                    "text": "ESE"
+                  },
+                  "to": 123.75
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 123.75,
+                  "result": {
+                    "text": "SE"
+                  },
+                  "to": 146.25
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 146.25,
+                  "result": {
+                    "text": "SSE"
+                  },
+                  "to": 168.75
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 168.75,
+                  "result": {
+                    "text": "S"
+                  },
+                  "to": 191.25
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 191.25,
+                  "result": {
+                    "text": "SSW"
+                  },
+                  "to": 213.75
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 213.75,
+                  "result": {
+                    "text": "SW"
+                  },
+                  "to": 236.25
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 236.25,
+                  "result": {
+                    "text": "WSW"
+                  },
+                  "to": 258.75
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 258.75,
+                  "result": {
+                    "text": "W"
+                  },
+                  "to": 281.25
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 281.25,
+                  "result": {
+                    "text": "WNW"
+                  },
+                  "to": 303.75
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 303.75,
+                  "result": {
+                    "text": "NW"
+                  },
+                  "to": 323.25
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 323.25,
+                  "result": {
+                    "text": "NNW"
+                  },
+                  "to": 348.75
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 348.75,
+                  "result": {
+                    "text": "N"
+                  },
+                  "to": 360
+                },
+                "type": "range"
+              }
+            ],
+            "max": 360,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green"
+                }
+              ]
+            },
+            "unit": "degree"
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "7.5.11",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"azi\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(B)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"azi\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([B])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "B",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"azi\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "C",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"azi\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "D",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"azi\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "E",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"azi\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "F",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"azi\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(GP)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "G",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"azi\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GP])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "H",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"azi\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(QS])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "I",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"azi\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([S])([0-9])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "J",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "title": "Satellite Az",
+        "type": "timeseries"
+      }
+    },
+    "y2jsdAz4k": {
+      "name": "Satellite El",
+      "uid": "y2jsdAz4k",
+      "kind": 1,
+      "model": {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "${DS_INFLUXDB}"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "graph": false,
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "lineInterpolation": "stepBefore",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "decimals": 0,
+            "mappings": [],
+            "max": 90,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green"
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "degree"
+          },
+          "overrides": []
+        },
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "7.5.11",
+        "targets": [
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ele\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(B)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ele\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([B])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "B",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ele\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "C",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ele\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "D",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ele\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "E",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ele\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "F",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ele\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(GP)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "G",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ele\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GP])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "H",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ele\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(QS])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "I",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "${DS_INFLUXDB}"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ele\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([S])([0-9])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> filter(fn: (r) => r[\"_value\"] > 0)\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "refId": "J",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "title": "Satellite El",
+        "type": "timeseries"
       }
     }
   },
@@ -1194,6 +3082,7 @@
   "liveNow": false,
   "panels": [
     {
+      "collapsed": false,
       "datasource": {
         "type": "influxdb",
         "uid": "pM3PWMq7z"
@@ -1205,6 +3094,7 @@
         "y": 0
       },
       "id": 17,
+      "panels": [],
       "targets": [
         {
           "datasource": {
@@ -1219,7 +3109,7 @@
     },
     {
       "gridPos": {
-        "h": 7,
+        "h": 6,
         "w": 5,
         "x": 0,
         "y": 1
@@ -1232,7 +3122,7 @@
     },
     {
       "gridPos": {
-        "h": 7,
+        "h": 6,
         "w": 5,
         "x": 5,
         "y": 1
@@ -1359,7 +3249,7 @@
       },
       "defaultLayer": "OpenStreetMap",
       "gridPos": {
-        "h": 7,
+        "h": 6,
         "w": 6,
         "x": 14,
         "y": 1
@@ -1418,7 +3308,7 @@
     },
     {
       "gridPos": {
-        "h": 4,
+        "h": 3,
         "w": 4,
         "x": 10,
         "y": 4
@@ -1434,7 +3324,7 @@
         "h": 3,
         "w": 20,
         "x": 0,
-        "y": 8
+        "y": 7
       },
       "id": 43,
       "libraryPanel": {
@@ -1447,7 +3337,7 @@
         "h": 6,
         "w": 13,
         "x": 0,
-        "y": 11
+        "y": 10
       },
       "id": 25,
       "libraryPanel": {
@@ -1460,7 +3350,7 @@
         "h": 6,
         "w": 7,
         "x": 13,
-        "y": 11
+        "y": 10
       },
       "id": 27,
       "libraryPanel": {
@@ -1473,7 +3363,7 @@
         "h": 10,
         "w": 10,
         "x": 0,
-        "y": 17
+        "y": 16
       },
       "id": 38,
       "libraryPanel": {
@@ -1486,7 +3376,7 @@
         "h": 10,
         "w": 10,
         "x": 10,
-        "y": 17
+        "y": 16
       },
       "id": 29,
       "libraryPanel": {
@@ -1504,7 +3394,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 27
+        "y": 26
       },
       "id": 19,
       "panels": [],
@@ -1521,548 +3411,50 @@
       "type": "row"
     },
     {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "${DS_INFLUXDB}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "graph": false,
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "smooth",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "decimals": 0,
-          "mappings": [],
-          "max": 60,
-          "min": 15,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "dB"
-        },
-        "overrides": []
-      },
       "gridPos": {
-        "h": 9,
+        "h": 8,
         "w": 20,
         "x": 0,
-        "y": 28
+        "y": 27
       },
-      "id": 7,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "7.5.11",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        }
-      ],
-      "title": "Satellite SNR",
-      "type": "timeseries"
+      "id": 51,
+      "libraryPanel": {
+        "uid": "F1MRFAzVk",
+        "name": "Satellite SNR"
+      }
     },
     {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "${DS_INFLUXDB}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "axisWidth": 50,
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "graph": false,
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "stepBefore",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "decimals": 0,
-          "mappings": [
-            {
-              "options": {
-                "from": 0,
-                "result": {
-                  "text": "N"
-                },
-                "to": 11.25
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 11.25,
-                "result": {
-                  "text": "NNE"
-                },
-                "to": 33.75
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 33.75,
-                "result": {
-                  "text": "NE"
-                },
-                "to": 56.25
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 56.25,
-                "result": {
-                  "text": "ENE"
-                },
-                "to": 78.75
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 78.75,
-                "result": {
-                  "text": "E"
-                },
-                "to": 101.25
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 101.25,
-                "result": {
-                  "text": "ESE"
-                },
-                "to": 123.75
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 123.75,
-                "result": {
-                  "text": "SE"
-                },
-                "to": 146.25
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 146.25,
-                "result": {
-                  "text": "SSE"
-                },
-                "to": 168.75
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 168.75,
-                "result": {
-                  "text": "S"
-                },
-                "to": 191.25
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 191.25,
-                "result": {
-                  "text": "SSW"
-                },
-                "to": 213.75
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 213.75,
-                "result": {
-                  "text": "SW"
-                },
-                "to": 236.25
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 236.25,
-                "result": {
-                  "text": "WSW"
-                },
-                "to": 258.75
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 258.75,
-                "result": {
-                  "text": "W"
-                },
-                "to": 281.25
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 281.25,
-                "result": {
-                  "text": "WNW"
-                },
-                "to": 303.75
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 303.75,
-                "result": {
-                  "text": "NW"
-                },
-                "to": 323.25
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 323.25,
-                "result": {
-                  "text": "NNW"
-                },
-                "to": 348.75
-              },
-              "type": "range"
-            },
-            {
-              "options": {
-                "from": 348.75,
-                "result": {
-                  "text": "N"
-                },
-                "to": 360
-              },
-              "type": "range"
-            }
-          ],
-          "max": 360,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              }
-            ]
-          },
-          "unit": "degree"
-        },
-        "overrides": []
-      },
       "gridPos": {
         "h": 11,
         "w": 10,
         "x": 0,
-        "y": 37
+        "y": 35
       },
-      "id": 8,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "7.5.11",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"azi\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        }
-      ],
-      "title": "Satellite Az",
-      "type": "timeseries"
+      "id": 49,
+      "libraryPanel": {
+        "uid": "yZAUO0kVk",
+        "name": "Satellite Az"
+      }
     },
     {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "${DS_INFLUXDB}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "graph": false,
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "stepBefore",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "decimals": 0,
-          "mappings": [],
-          "max": 90,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "degree"
-        },
-        "overrides": []
-      },
       "gridPos": {
         "h": 11,
         "w": 10,
         "x": 10,
-        "y": 37
+        "y": 35
       },
-      "id": 9,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "7.5.11",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_INFLUXDB}"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "from(bucket: \"gpsd\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"ele\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": []
-        }
-      ],
-      "title": "Satellite El",
-      "type": "timeseries"
+      "id": 47,
+      "libraryPanel": {
+        "uid": "y2jsdAz4k",
+        "name": "Satellite El"
+      }
     },
     {
       "gridPos": {
         "h": 24,
         "w": 20,
         "x": 0,
-        "y": 48
+        "y": 46
       },
       "id": 30,
       "libraryPanel": {
@@ -2101,13 +3493,13 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "LEA-M8F GNSS Status",
   "uid": "cttz3OkVz",
-  "version": 31,
+  "version": 38,
   "weekStart": ""
 }
