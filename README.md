@@ -4,6 +4,8 @@ Based on https://github.com/mzac/gpsd-influx
 Updated to use the influxdb v2 API, also added satellites visibility and tracked counts to the log output.
 
 You can also optionally log detailed satellite information by adding -s to the command line.
+Be warned that logging and plotting this additional data will put a lot of load on the database so probably not a good idea unless it's running on a real computer.
+
 Use -o to disable database writes (useful with -d)
 
 ## Grafana Dashboard
