@@ -27,7 +27,7 @@ Then pull into /opt
 ```
 cd /opt
 
-sudo git pull https://github.com/longview/gpsd_influx2.git
+sudo git clone https://github.com/longview/gpsd_influx2.git
 ```
 It loads the configuration from config.ini, the format is standard. A sample file in included, edit it to add your database details & API key.
 
