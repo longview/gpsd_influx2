@@ -71,7 +71,7 @@
           "text": {},
           "textMode": "auto"
         },
-        "pluginVersion": "9.0.5",
+        "pluginVersion": "9.0.6",
         "targets": [
           {
             "datasource": {
@@ -188,7 +188,7 @@
           "text": {},
           "textMode": "auto"
         },
-        "pluginVersion": "9.0.5",
+        "pluginVersion": "9.0.6",
         "targets": [
           {
             "datasource": {
@@ -329,7 +329,7 @@
           "text": {},
           "textMode": "auto"
         },
-        "pluginVersion": "9.0.5",
+        "pluginVersion": "9.0.6",
         "targets": [
           {
             "datasource": {
@@ -422,7 +422,7 @@
           "text": {},
           "textMode": "auto"
         },
-        "pluginVersion": "9.0.5",
+        "pluginVersion": "9.0.6",
         "targets": [
           {
             "datasource": {
@@ -690,7 +690,7 @@
           "showThresholdMarkers": true,
           "text": {}
         },
-        "pluginVersion": "9.0.5",
+        "pluginVersion": "9.0.6",
         "targets": [
           {
             "datasource": {
@@ -838,14 +838,25 @@
             "mappings": [
               {
                 "options": {
-                  "0": {
+                  "from": 0.5,
+                  "result": {
+                    "index": 0,
+                    "text": "Y"
+                  },
+                  "to": 1
+                },
+                "type": "range"
+              },
+              {
+                "options": {
+                  "from": 0,
+                  "result": {
+                    "index": 1,
                     "text": "N"
                   },
-                  "1": {
-                    "text": "Y"
-                  }
+                  "to": 0.5
                 },
-                "type": "value"
+                "type": "range"
               }
             ],
             "max": 1,
@@ -869,12 +880,12 @@
         },
         "options": {
           "colorMode": "value",
-          "graphMode": "area",
+          "graphMode": "none",
           "justifyMode": "auto",
           "orientation": "auto",
           "reduceOptions": {
             "calcs": [
-              "lastNotNull"
+              "last"
             ],
             "fields": "",
             "values": false
@@ -882,7 +893,7 @@
           "text": {},
           "textMode": "auto"
         },
-        "pluginVersion": "9.0.5",
+        "pluginVersion": "9.0.6",
         "targets": [
           {
             "datasource": {
@@ -905,7 +916,7 @@
             ],
             "orderByTime": "ASC",
             "policy": "default",
-            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(B)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(B)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
             "refId": "A",
             "resultFormat": "time_series",
             "select": [
@@ -930,7 +941,7 @@
               "uid": "${DS_INFLUXDB}"
             },
             "hide": false,
-            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([B])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([B])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
             "refId": "B"
           },
           {
@@ -939,7 +950,7 @@
               "uid": "${DS_INFLUXDB}"
             },
             "hide": false,
-            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
             "refId": "H"
           },
           {
@@ -948,7 +959,7 @@
               "uid": "${DS_INFLUXDB}"
             },
             "hide": false,
-            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GA])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
             "refId": "I"
           },
           {
@@ -957,7 +968,7 @@
               "uid": "${DS_INFLUXDB}"
             },
             "hide": false,
-            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
             "refId": "E"
           },
           {
@@ -966,7 +977,7 @@
               "uid": "${DS_INFLUXDB}"
             },
             "hide": false,
-            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GL])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
             "refId": "F"
           },
           {
@@ -975,7 +986,7 @@
               "uid": "${DS_INFLUXDB}"
             },
             "hide": false,
-            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(GP)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /(GP)([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
             "refId": "C"
           },
           {
@@ -984,7 +995,7 @@
               "uid": "${DS_INFLUXDB}"
             },
             "hide": false,
-            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GP])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([GP])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
             "refId": "D"
           },
           {
@@ -993,7 +1004,7 @@
               "uid": "${DS_INFLUXDB}"
             },
             "hide": false,
-            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([QS])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([QS])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
             "refId": "G"
           },
           {
@@ -1002,7 +1013,7 @@
               "uid": "${DS_INFLUXDB}"
             },
             "hide": false,
-            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"snr\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([S])([0-9])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
+            "query": "from(bucket: \"gpsd\")\r\n  |> range(start: -1m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"gpsd_sat_details\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"used\")\r\n  |> filter(fn: (r) => r[\"host\"] == \"${host}\")\r\n  |> filter(fn: (r) => r[\"prn\"] =~ /([S])([0-9])([0-9])([0-9]$)/)\r\n  |> group(columns: [\"prn\"])\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\r\n  |> yield(name: \"mean\")",
             "refId": "J"
           }
         ],
@@ -2081,8 +2092,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 }
               ]
             },
@@ -2569,8 +2579,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "green",
-                  "value": null
+                  "color": "green"
                 },
                 {
                   "color": "red",
@@ -3021,7 +3030,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "9.0.5"
+      "version": "9.0.6"
     },
     {
       "type": "datasource",
@@ -3197,7 +3206,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "9.0.5",
+      "pluginVersion": "9.0.6",
       "targets": [
         {
           "datasource": {
@@ -3502,6 +3511,6 @@
   "timezone": "",
   "title": "LEA-M8F GNSS Status",
   "uid": "cttz3OkVz",
-  "version": 38,
+  "version": 39,
   "weekStart": ""
 }
