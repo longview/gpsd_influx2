@@ -80,7 +80,7 @@ if __name__ == '__main__':
                 gpsd_lat   = float(gpsd.fix.latitude)
                 gpsd_lon   = float(gpsd.fix.longitude)
                 gpsd_mode  = float(gpsd.fix.mode)
-                gpsd_status  = int(gpsd.status)
+                gpsd_status  = int(gpsd.fix.status)
                 gpsd_speed = float(gpsd.fix.speed)
                 gpsd_track = float(gpsd.fix.track)
                 gpsd_sats_vis = int(len(gpsd.satellites))
@@ -89,7 +89,7 @@ if __name__ == '__main__':
                 # combined status field, 0-4 = ZERO, NO_FIX, 2D, 3D, DGPS
                 gpsd_status_combined = gpsd_mode
                 if gpsd_status == 2 and gpsd_mode == 3:
-                    gpsd_status_combined = 4
+                    gpsd_status_combined = 4.0
 
                 # Make sure we have a lat, lon and alt
                 if debug == True:
